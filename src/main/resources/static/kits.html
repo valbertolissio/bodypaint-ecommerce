@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Paint - Kits</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        header { background: #2E4A8F; color: white; padding: 20px 40px; }
+        header h1 { font-size: 24px; }
+        nav { background: #1F3A6E; padding: 10px 40px; display: flex; gap: 20px; }
+        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; }
+        nav a:hover { background: #2E4A8F; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h2 { color: #2E4A8F; margin-bottom: 16px; font-size: 20px; }
+        .btn { background: #2E4A8F; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #1F3A6E; }
+        .btn-danger { background: #CC0000; }
+        .btn-danger:hover { background: #990000; }
+        input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2E4A8F; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .mensaje { padding: 10px; border-radius: 4px; margin-bottom: 12px; display: none; }
+        .mensaje.ok { background: #EEF5E8; color: #3B6D11; display: block; }
+        .mensaje.error { background: #FCEBEB; color: #A32D2D; display: block; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎨 Body Paint - Panel de Administración</h1>
+    </header>
+    <nav>
+        <a href="index.html">Productos</a>
+        <a href="kits.html">Kits</a>
+        <a href="bajo-stock.html">Bajo Stock</a>
+        <a href="importar.html">Importar</a>
+        <a href="cupones.html">Cupones</a>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h2>Crear Kit</h2>
+            <div id="msg-kit" class="mensaje"></div>
+            <div class="form-group">
+                <input type="text" id="kit-nombre" placeholder="Nombre del kit" />
+                <input type="number" id="kit-precio" placeholder="Precio del kit" />
+            </div>
+            <button class="btn" onclick="crearKit()">Crear Kit</button>
+        </div>
+        <div class="card">
+            <h2>Agregar Producto a Kit</h2>
+            <div id="msg-agregar" class="mensaje"></div>
+            <div class="form-group">
+                <input type="number" id="kit-id" placeholder="ID del kit" />
+                <input type="number" id="producto-id" placeholder="ID del producto" />
+            </div>
+            <button class="btn" onclick="agregarProducto()">Agregar Producto</button>
+        </div>
+        <div class="card">
+            <h2>Listado de Kits</h2>
+            <button class="btn" onclick="cargarKits()" style="margin-bottom:16px">Actualizar</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Productos</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-kits"></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const API = 'http://localhost:8081/api';
+
+        async function cargarKits() {
+            const res = await fetch(API + '/kits');
+            const kits = await res.json();
+            const tbody = document.getElementById('tabla-kits');
+            tbody.innerHTML = '';
+            kits.forEach(k => {
+                const productos = k.productos.map(p => p.nombre).join(', ') || 'Sin productos';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${k.id}</td>
+                        <td>${k.nombre}</td>
+                        <td>$${k.precio}</td>
+                        <td>${productos}</td>
+                        <td>${k.activo ? '✅ Activo' : '❌ Inactivo'}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="darDeBaja(${k.id})">Dar de baja</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function crearKit() {
+            const kit = {
+                nombre: document.getElementById('kit-nombre').value,
+                precio: parseFloat(document.getElementById('kit-precio').value)
+            };
+            const res = await fetch(API + '/kits', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(kit)
+            });
+            const msg = document.getElementById('msg-kit');
+            if (res.ok) {
+                msg.className = 'mensaje ok';
+                msg.textContent = 'Kit creado correctamente.';
+                cargarKits();
+            } else {
+                msg.className = 'mensaje error';
+                msg.textContent = 'Error al crear el kit.';
+            }
+        }
+
+        async function agregarProducto() {
+            const kitId = document.getElementById('kit-id').value;
+            const productoId = document.getElementById('producto-id').value;
+            const res = await fetch(API + '/kits/' + kitId + '/productos/' + productoId, { method: 'POST' });
+            const msg = document.getElementById('msg-agregar');
+            if (res.ok) {
+                msg.className = 'mensaje ok';
+                msg.textContent = 'Producto agregado al kit correctamente.';
+                cargarKits();
+            } else {
+                msg.className = 'mensaje error';
+                msg.textContent = 'Error al agregar el producto.';
+            }
+        }
+
+        async function darDeBaja(id) {
+            if (!confirm('¿Dar de baja este kit?')) return;
+            await fetch(API + '/kits/' + id, { method: 'DELETE' });
+            cargarKits();
+        }
+
+        cargarKits();
+    </script>
+</body>
+</html>

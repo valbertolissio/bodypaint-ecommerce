@@ -5,6 +5,7 @@ import com.bodypaint.ecommerce.model.Producto;
 import com.bodypaint.ecommerce.repository.KitRepository;
 import com.bodypaint.ecommerce.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
@@ -32,8 +33,10 @@ public class KitService {
         return kitRepository.save(kit);
     }
 
+    @Transactional
     public Kit agregarProducto(Long kitId, Long productoId) {
-        Kit kit = obtenerPorId(kitId);
+        Kit kit = kitRepository.findById(kitId)
+            .orElseThrow(() -> new RuntimeException("Kit no encontrado"));
         Producto producto = productoRepository.findById(productoId)
             .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         boolean yaExiste = kit.getProductos().stream()

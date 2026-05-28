@@ -16,21 +16,13 @@ public class Kit {
     private Double precio;
     private Boolean activo;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "kit_productos",
         joinColumns = @JoinColumn(name = "kit_id"),
         inverseJoinColumns = @JoinColumn(name = "producto_id")
     )
     private List<Producto> productos = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(
-        name = "kit_subkits",
-        joinColumns = @JoinColumn(name = "kit_id"),
-        inverseJoinColumns = @JoinColumn(name = "subkit_id")
-    )
-    private List<Kit> subkits = new ArrayList<>();
 
     public Kit() {}
 
@@ -48,7 +40,4 @@ public class Kit {
 
     public List<Producto> getProductos() { return productos; }
     public void setProductos(List<Producto> productos) { this.productos = productos; }
-
-    public List<Kit> getSubkits() { return subkits; }
-    public void setSubkits(List<Kit> subkits) { this.subkits = subkits; }
 }

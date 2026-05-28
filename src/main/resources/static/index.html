@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Paint - Panel de Administración</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        header { background: #2E4A8F; color: white; padding: 20px 40px; display: flex; align-items: center; gap: 16px; }
+        header h1 { font-size: 24px; }
+        nav { background: #1F3A6E; padding: 10px 40px; display: flex; gap: 20px; }
+        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; }
+        nav a:hover { background: #2E4A8F; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h2 { color: #2E4A8F; margin-bottom: 16px; font-size: 20px; }
+        .btn { background: #2E4A8F; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #1F3A6E; }
+        .btn-danger { background: #CC0000; }
+        .btn-danger:hover { background: #990000; }
+        .btn-warning { background: #CC6600; }
+        input, select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2E4A8F; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+        .alerta { color: red; font-weight: bold; }
+        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .mensaje { padding: 10px; border-radius: 4px; margin-bottom: 12px; display: none; }
+        .mensaje.ok { background: #EEF5E8; color: #3B6D11; display: block; }
+        .mensaje.error { background: #FCEBEB; color: #A32D2D; display: block; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎨 Body Paint - Panel de Administración</h1>
+    </header>
+    <nav>
+        <a href="index.html">Productos</a>
+        <a href="kits.html">Kits</a>
+        <a href="bajo-stock.html">Bajo Stock</a>
+        <a href="importar.html">Importar</a>
+        <a href="cupones.html">Cupones</a>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h2>Crear Producto</h2>
+            <div id="msg-crear" class="mensaje"></div>
+            <div class="form-group">
+                <input type="text" id="nombre" placeholder="Nombre del producto" />
+                <input type="text" id="marca" placeholder="Marca" />
+                <input type="number" id="precio" placeholder="Precio" />
+                <input type="number" id="stock" placeholder="Stock inicial" />
+                <input type="number" id="stockMinimo" placeholder="Stock mínimo" />
+            </div>
+            <button class="btn" onclick="crearProducto()">Crear Producto</button>
+        </div>
+        <div class="card">
+            <h2>Listado de Productos</h2>
+            <button class="btn" onclick="cargarProductos()" style="margin-bottom:16px">Actualizar</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Marca</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Stock Mínimo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-productos"></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const API = 'http://localhost:8081/api';
+
+        async function cargarProductos() {
+            const res = await fetch(API + '/productos');
+            const productos = await res.json();
+            const tbody = document.getElementById('tabla-productos');
+            tbody.innerHTML = '';
+            productos.forEach(p => {
+                const bajStock = p.stock <= p.stockMinimo;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${p.id}</td>
+                        <td>${bajStock ? '🔴 ' : ''}${p.nombre}</td>
+                        <td>${p.marca}</td>
+                        <td>$${p.precio}</td>
+                        <td class="${bajStock ? 'alerta' : ''}">${p.stock}</td>
+                        <td>${p.stockMinimo}</td>
+                        <td>${p.activo ? '✅ Activo' : '❌ Inactivo'}</td>
+                        <td>
+                            <button class="btn btn-warning" onclick="editarStockMinimo(${p.id})">Stock Mín.</button>
+                            <button class="btn btn-danger" onclick="darDeBaja(${p.id})">Dar de baja</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function crearProducto() {
+            const producto = {
+                nombre: document.getElementById('nombre').value,
+                marca: document.getElementById('marca').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                stock: parseInt(document.getElementById('stock').value),
+                stockMinimo: parseInt(document.getElementById('stockMinimo').value)
+            };
+            const res = await fetch(API + '/productos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(producto)
+            });
+            const msg = document.getElementById('msg-crear');
+            if (res.ok) {
+                msg.className = 'mensaje ok';
+                msg.textContent = 'Producto creado correctamente.';
+                cargarProductos();
+            } else {
+                msg.className = 'mensaje error';
+                msg.textContent = 'Error al crear el producto.';
+            }
+        }
+
+        async function editarStockMinimo(id) {
+            const valor = prompt('Ingresá el nuevo stock mínimo:');
+            if (valor === null) return;
+            await fetch(API + '/productos/' + id + '/stock-minimo?stockMinimo=' + valor, { method: 'PATCH' });
+            cargarProductos();
+        }
+
+        async function darDeBaja(id) {
+            if (!confirm('¿Dar de baja este producto?')) return;
+            await fetch(API + '/kits/productos/' + id, { method: 'DELETE' });
+            cargarProductos();
+        }
+
+        cargarProductos();
+    </script>
+</body>
+</html>

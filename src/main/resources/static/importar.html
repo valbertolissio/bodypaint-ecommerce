@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Paint - Importar Productos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        header { background: #2E4A8F; color: white; padding: 20px 40px; }
+        header h1 { font-size: 24px; }
+        nav { background: #1F3A6E; padding: 10px 40px; display: flex; gap: 20px; }
+        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; }
+        nav a:hover { background: #2E4A8F; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h2 { color: #2E4A8F; margin-bottom: 16px; font-size: 20px; }
+        .btn { background: #2E4A8F; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #1F3A6E; }
+        input[type="file"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; margin-bottom: 12px; }
+        .mensaje { padding: 10px; border-radius: 4px; margin-top: 12px; display: none; }
+        .mensaje.ok { background: #EEF5E8; color: #3B6D11; display: block; }
+        .mensaje.error { background: #FCEBEB; color: #A32D2D; display: block; }
+        .formato { background: #EEF2FA; border-radius: 4px; padding: 12px; margin-bottom: 16px; font-size: 13px; color: #1F3A6E; }
+        code { background: #ddd; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎨 Body Paint - Panel de Administración</h1>
+    </header>
+    <nav>
+        <a href="index.html">Productos</a>
+        <a href="kits.html">Kits</a>
+        <a href="bajo-stock.html">Bajo Stock</a>
+        <a href="importar.html">Importar</a>
+        <a href="cupones.html">Cupones</a>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h2>Importar productos desde CSV</h2>
+            <div class="formato">
+                El archivo CSV debe tener las columnas: <code>nombre, marca, stock, precio</code><br>
+                Ejemplo: <code>Pincel fino,ArtBrush,50,300</code>
+            </div>
+            <input type="file" id="archivo-csv" accept=".csv" />
+            <button class="btn" onclick="importarCSV()">Importar CSV</button>
+            <div id="msg-csv" class="mensaje"></div>
+        </div>
+        <div class="card">
+            <h2>Importar productos desde XLS</h2>
+            <div class="formato">
+                El archivo XLS debe tener las columnas en orden: <code>nombre, marca, stock, precio</code><br>
+                La primera fila debe ser el encabezado.
+            </div>
+            <input type="file" id="archivo-xls" accept=".xlsx,.xls" />
+            <button class="btn" onclick="importarXLS()">Importar XLS</button>
+            <div id="msg-xls" class="mensaje"></div>
+        </div>
+    </div>
+    <script>
+        const API = 'http://localhost:8081/api';
+
+        async function importarCSV() {
+            const file = document.getElementById('archivo-csv').files[0];
+            if (!file) { alert('Seleccioná un archivo CSV'); return; }
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(API + '/importar/csv', { method: 'POST', body: formData });
+            const msg = document.getElementById('msg-csv');
+            if (res.ok) {
+                const data = await res.json();
+                msg.className = 'mensaje ok';
+                msg.textContent = `Importación exitosa. Nuevos: ${data.nuevos.length} | Actualizados: ${data.actualizados.length}`;
+            } else {
+                msg.className = 'mensaje error';
+                msg.textContent = 'Error al importar. Verificá el formato del archivo.';
+            }
+        }
+
+        async function importarXLS() {
+            const file = document.getElementById('archivo-xls').files[0];
+            if (!file) { alert('Seleccioná un archivo XLS'); return; }
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(API + '/importar/xls', { method: 'POST', body: formData });
+            const msg = document.getElementById('msg-xls');
+            if (res.ok) {
+                const data = await res.json();
+                msg.className = 'mensaje ok';
+                msg.textContent = `Importación exitosa. Nuevos: ${data.nuevos.length} | Actualizados: ${data.actualizados.length}`;
+            } else {
+                msg.className = 'mensaje error';
+                msg.textContent = 'Error al importar. Verificá el formato del archivo.';
+            }
+        }
+    </script>
+</body>
+</html>

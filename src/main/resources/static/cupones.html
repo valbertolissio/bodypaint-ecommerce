@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Paint - Cupones</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        header { background: #2E4A8F; color: white; padding: 20px 40px; }
+        header h1 { font-size: 24px; }
+        nav { background: #1F3A6E; padding: 10px 40px; display: flex; gap: 20px; }
+        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; }
+        nav a:hover { background: #2E4A8F; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h2 { color: #2E4A8F; margin-bottom: 16px; font-size: 20px; }
+        .btn { background: #2E4A8F; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #1F3A6E; }
+        input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2E4A8F; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+        .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .mensaje { padding: 10px; border-radius: 4px; margin-bottom: 12px; display: none; }
+        .mensaje.ok { background: #EEF5E8; color: #3B6D11; display: block; }
+        .mensaje.error { background: #FCEBEB; color: #A32D2D; display: block; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>�� Body Paint - Panel de Administración</h1>
+    </header>
+    <nav>
+        <a href="index.html">Productos</a>
+        <a href="kits.html">Kits</a>
+        <a href="bajo-stock.html">Bajo Stock</a>
+        <a href="importar.html">Importar</a>
+        <a href="cupones.html">Cupones</a>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h2>Generar Cupón de Descuento</h2>
+            <div id="msg-generar" class="mensaje"></div>
+            <div class="form-group">
+                <input type="email" id="cupon-email" placeholder="Email del cliente" />
+                <input type="number" id="cupon-descuento" placeholder="Monto de descuento ($)" />
+                <input type="date" id="cupon-fecha" placeholder="Válido hasta" />
+            </div>
+            <button class="btn" onclick="generarCupon()">Generar Cupón</button>
+        </div>
+        <div class="card">
+            <h2>Aplicar Cupón</h2>
+            <div id="msg-aplicar" class="mensaje"></div>
+            <div class="form-group">
+                <input type="text" id="cupon-codigo" placeholder="Código del cupón" />
+                <input type="number" id="cupon-monto" placeholder="Monto total del pedido ($)" />
+            </div>
+            <button class="btn" onclick="aplicarCupon()">Aplicar Cupón</button>
+        </div>
+        <div class="card">
+            <h2>Listado de Cupones</h2>
+            <button class="btn" onclick="cargarCupones()" style="margin-bottom:16px">Actualizar</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Cliente</th>
+                        <th>Descuento</th>
+                        <th>Válido hasta</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-cupones"></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const API = 'http://localhost:8081/api';
+
+        async function cargarCupones() {
+            const res = await fetch(API + '/cupones');
+            const cupones = await res.json();
+            const tbody = document.getElementById('tabla-cupones');
+            tbody.innerHTML = '';
+            cupones.forEach(c => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${c.codigo}</strong></td>
+                        <td>${c.clienteEmail}</td>
+                        <td>$${c.descuento}</td>
+                        <td>${c.validoHasta}</td>
+                        <td>${c.usado ? '❌ Usado' : '✅ Disponible'}</td>
+                    </tr>`;
+            });
+        }
+
+        async function generarCupon() {
+            const body = {
+                clienteEmail: document.getElementById('cupon-email').value,
+                descuento: document.getElementById('cupon-descuento').value,
+                validoHasta: document.getElementById('cupon-fecha').value
+            };
+            const res = await fetch(API + '/cupones/generar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const msg = document.getElementById('msg-generar');
+            if (res.ok) {
+                const data = await res.json();
+                msg.className = 'mensaje ok';
+                msg.textContent = `Cupón generado: ${data.codigo} - Descuento: $${data.descuento}`;
+                cargarCupones();
+            } else {
+                msg.className = 'mensaje error';
+                msg.textContent = 'Error al generar el cupón.';
+            }
+        }
+
+        async function aplicarCupon() {
+            const body = {
+                codigo: document.getElementById('cupon-codigo').value,
+                montoTotal: document.getElementById('cupon-monto').value
+            };
+            const res = await fetch(API + '/cupones/aplicar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            const msg = document.getElementById('msg-aplicar');
+            if (res.ok) {
+                msg.className = 'mensaje ok';
+                msg.textContent = `Descuento aplicado: $${data.descuento}. Monto final: $${data.montoFinal}`;
+            } else {
+                msg.className = 'mensaje error';
+                msg.textContent = data.error || 'Error al aplicar el cupón.';
+            }
+        }
+
+        cargarCupones();
+    </script>
+</body>
+</html>
