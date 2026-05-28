@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Paint - Panel Vendedor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f8ff; color: #111; }
+        header { background: #0099cc; color: white; padding: 16px 40px; }
+        header h1 { font-size: 22px; }
+        nav { background: #007aa3; padding: 10px 40px; display: flex; gap: 20px; }
+        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; }
+        nav a:hover { background: #0099cc; }
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 10px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,153,204,0.1); border: 1px solid #cce6f4; }
+        .card h2 { color: #0099cc; margin-bottom: 16px; font-size: 20px; }
+        .btn { background: #0099cc; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .btn:hover { background: #007aa3; }
+        .btn-verde { background: #2e9e4f; }
+        .btn-rojo { background: #cc3300; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #0099cc; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #cce6f4; }
+        tr:hover { background: #f0f8ff; }
+        select { padding: 6px 10px; border: 1px solid #aaddee; border-radius: 6px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎨 Body Paint - Panel Vendedor</h1>
+    </header>
+    <nav>
+        <a href="index.html">Admin Productos</a>
+        <a href="vendedor.html">Panel Vendedor</a>
+        <a href="tienda.html">Tienda</a>
+    </nav>
+    <div class="container">
+        <div class="card">
+            <h2>📦 Pedidos</h2>
+            <button class="btn" onclick="cargarPedidos()" style="margin-bottom:16px">Actualizar</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Forma de pago</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-pedidos"></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const API = 'http://localhost:8081/api';
+
+        async function cargarPedidos() {
+            const res = await fetch(API + '/pedidos');
+            const pedidos = await res.json();
+            const tbody = document.getElementById('tabla-pedidos');
+            tbody.innerHTML = '';
+            pedidos.forEach(p => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>#${p.id}</td>
+                        <td>${p.cliente.nombre} ${p.cliente.apellido}</td>
+                        <td>${p.fecha}</td>
+                        <td>$${p.total}</td>
+                        <td>${p.formaPago}</td>
+                        <td><strong>${p.estado}</strong></td>
+                        <td>
+                            <select id="estado-${p.id}">
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="EN_CAMINO">En camino</option>
+                                <option value="ENTREGADO">Entregado</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select>
+                            <button class="btn btn-verde" onclick="cambiarEstado(${p.id})">Actualizar</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function cambiarEstado(id) {
+            const estado = document.getElementById('estado-' + id).value;
+            await fetch(API + '/pedidos/' + id + '/estado', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ estado })
+            });
+            cargarPedidos();
+        }
+
+        cargarPedidos();
+    </script>
+</body>
+</html>
