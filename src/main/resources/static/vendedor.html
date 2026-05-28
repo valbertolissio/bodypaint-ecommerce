@@ -3,96 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Body Paint - Panel Vendedor</title>
+    <title>Body Paint - Vendedor</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f0f8ff; color: #111; }
-        header { background: #0099cc; color: white; padding: 16px 40px; }
-        header h1 { font-size: 22px; }
-        nav { background: #007aa3; padding: 10px 40px; display: flex; gap: 20px; }
-        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; }
-        nav a:hover { background: #0099cc; }
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
-        .card { background: white; border-radius: 10px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,153,204,0.1); border: 1px solid #cce6f4; }
-        .card h2 { color: #0099cc; margin-bottom: 16px; font-size: 20px; }
-        .btn { background: #0099cc; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        body { font-family: Arial, sans-serif; background: #f0f8ff; color: #111; height: 100vh; display: flex; flex-direction: column; }
+        header { background: #0099cc; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        header h1 { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+        header span { font-size: 13px; opacity: 0.85; }
+        .layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 220px; background: #007aa3; flex-shrink: 0; display: flex; flex-direction: column; padding-top: 8px; }
+        .sidebar .seccion-label { color: rgba(255,255,255,0.5); font-size: 11px; padding: 16px 24px 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .sidebar a { color: white; text-decoration: none; padding: 14px 24px; font-size: 14px; border-left: 3px solid transparent; cursor: pointer; display: block; }
+        .sidebar a:hover { background: #0099cc; border-left-color: rgba(255,255,255,0.5); }
+        .sidebar a.activa { background: #005f80; border-left-color: white; font-weight: bold; }
+        .main { flex: 1; overflow-y: auto; padding: 32px; }
+        .card { background: white; border-radius: 8px; padding: 28px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,153,204,0.1); border: 1px solid #cce6f4; }
+        .card h2 { color: #0099cc; margin-bottom: 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid #cce6f4; padding-bottom: 12px; }
+        .btn { background: #0099cc; color: white; border: none; padding: 9px 18px; border-radius: 4px; cursor: pointer; font-size: 13px; }
         .btn:hover { background: #007aa3; }
-        .btn-verde { background: #2e9e4f; }
+        .btn-verde { background: #2e7d4f; }
+        .btn-verde:hover { background: #235f3b; }
         .btn-rojo { background: #cc3300; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #0099cc; color: white; padding: 10px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #cce6f4; }
-        tr:hover { background: #f0f8ff; }
-        select { padding: 6px 10px; border: 1px solid #aaddee; border-radius: 6px; font-size: 13px; }
+        .btn-rojo:hover { background: #aa2200; }
+        select { padding: 7px 10px; border: 1px solid #aaddee; border-radius: 4px; font-size: 13px; background: #f7fbff; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #0099cc; color: white; padding: 10px 12px; text-align: left; font-weight: normal; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e6f4fb; vertical-align: middle; }
+        tr:hover td { background: #f7fbff; }
+        .seccion { display: none; }
+        .seccion.activa { display: block; }
+        .badge-estado { padding: 3px 10px; border-radius: 10px; font-size: 12px; }
+        .badge-pendiente { background: #fff3e0; color: #cc6600; }
+        .badge-camino { background: #e6f4fb; color: #0099cc; }
+        .badge-entregado { background: #e6f9ee; color: #1a6e35; }
+        .badge-cancelado { background: #fdecea; color: #a32d2d; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 8px; padding: 20px; border: 1px solid #cce6f4; text-align: center; }
+        .stat-card .numero { font-size: 32px; font-weight: bold; color: #0099cc; }
+        .stat-card .label { font-size: 13px; color: #666; margin-top: 4px; }
     </style>
 </head>
 <body>
     <header>
-        <h1>🎨 Body Paint - Panel Vendedor</h1>
+        <h1>BODY PAINT</h1>
+        <span>Panel del Vendedor</span>
     </header>
-    <nav>
-        <a href="index.html">Admin Productos</a>
-        <a href="vendedor.html">Panel Vendedor</a>
-        <a href="tienda.html">Tienda</a>
-    </nav>
-    <div class="container">
-        <div class="card">
-            <h2>📦 Pedidos</h2>
-            <button class="btn" onclick="cargarPedidos()" style="margin-bottom:16px">Actualizar</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Cliente</th>
-                        <th>Fecha</th>
-                        <th>Total</th>
-                        <th>Forma de pago</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-pedidos"></tbody>
-            </table>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="seccion-label">Pedidos</div>
+            <a onclick="mostrar('sec-todos')" id="nav-todos" class="activa">Todos los pedidos</a>
+            <a onclick="mostrar('sec-pendientes')" id="nav-pendientes">Pendientes</a>
+            <div class="seccion-label">Navegacion</div>
+            <a href="index.html">Panel administrador</a>
+            <a href="tienda.html">Ver tienda</a>
+        </div>
+
+        <div class="main">
+
+            <!-- RESUMEN -->
+            <div id="sec-todos" class="seccion activa">
+                <div class="stats" id="stats-container"></div>
+                <div class="card">
+                    <h2>Todos los pedidos</h2>
+                    <button class="btn" onclick="cargarPedidos()" style="margin-bottom:16px">Actualizar</button>
+                    <table>
+                        <thead><tr><th>ID</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Forma de pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="tabla-pedidos"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PENDIENTES -->
+            <div id="sec-pendientes" class="seccion">
+                <div class="card">
+                    <h2>Pedidos pendientes</h2>
+                    <button class="btn" onclick="cargarPendientes()" style="margin-bottom:16px">Actualizar</button>
+                    <table>
+                        <thead><tr><th>ID</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Forma de pago</th><th>Acciones</th></tr></thead>
+                        <tbody id="tabla-pendientes"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
+
     <script>
         const API = 'http://localhost:8081/api';
+
+        function mostrar(id) {
+            document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+            document.getElementById(id).classList.add('activa');
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('activa'));
+            const map = { 'sec-todos': 'nav-todos', 'sec-pendientes': 'nav-pendientes' };
+            if (map[id]) document.getElementById(map[id]).classList.add('activa');
+            if (id === 'sec-todos') cargarPedidos();
+            if (id === 'sec-pendientes') cargarPendientes();
+        }
+
+        function badgeEstado(estado) {
+            const map = { 'PENDIENTE': 'badge-pendiente', 'EN_CAMINO': 'badge-camino', 'ENTREGADO': 'badge-entregado', 'CANCELADO': 'badge-cancelado' };
+            return `<span class="badge-estado ${map[estado] || ''}">${estado}</span>`;
+        }
 
         async function cargarPedidos() {
             const res = await fetch(API + '/pedidos');
             const pedidos = await res.json();
             const tbody = document.getElementById('tabla-pedidos');
             tbody.innerHTML = '';
+
+            const stats = { total: pedidos.length, pendientes: 0, camino: 0, entregados: 0 };
             pedidos.forEach(p => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>#${p.id}</td>
-                        <td>${p.cliente.nombre} ${p.cliente.apellido}</td>
-                        <td>${p.fecha}</td>
-                        <td>$${p.total}</td>
-                        <td>${p.formaPago}</td>
-                        <td><strong>${p.estado}</strong></td>
-                        <td>
-                            <select id="estado-${p.id}">
-                                <option value="PENDIENTE">Pendiente</option>
-                                <option value="EN_CAMINO">En camino</option>
-                                <option value="ENTREGADO">Entregado</option>
-                                <option value="CANCELADO">Cancelado</option>
-                            </select>
-                            <button class="btn btn-verde" onclick="cambiarEstado(${p.id})">Actualizar</button>
-                        </td>
-                    </tr>`;
+                if (p.estado === 'PENDIENTE') stats.pendientes++;
+                if (p.estado === 'EN_CAMINO') stats.camino++;
+                if (p.estado === 'ENTREGADO') stats.entregados++;
+                tbody.innerHTML += `<tr>
+                    <td>#${p.id}</td>
+                    <td>${p.cliente.nombre} ${p.cliente.apellido}</td>
+                    <td>${p.fecha ? p.fecha.substring(0,10) : '-'}</td>
+                    <td>$${p.total}</td>
+                    <td>${p.formaPago}</td>
+                    <td>${badgeEstado(p.estado)}</td>
+                    <td>
+                        <select id="estado-${p.id}">
+                            <option value="PENDIENTE" ${p.estado==='PENDIENTE'?'selected':''}>Pendiente</option>
+                            <option value="EN_CAMINO" ${p.estado==='EN_CAMINO'?'selected':''}>En camino</option>
+                            <option value="ENTREGADO" ${p.estado==='ENTREGADO'?'selected':''}>Entregado</option>
+                            <option value="CANCELADO" ${p.estado==='CANCELADO'?'selected':''}>Cancelado</option>
+                        </select>
+                        <button class="btn btn-verde" style="margin-left:6px" onclick="cambiarEstado(${p.id})">Guardar</button>
+                    </td>
+                </tr>`;
+            });
+
+            document.getElementById('stats-container').innerHTML = `
+                <div class="stat-card"><div class="numero">${stats.total}</div><div class="label">Total pedidos</div></div>
+                <div class="stat-card"><div class="numero" style="color:#cc6600">${stats.pendientes}</div><div class="label">Pendientes</div></div>
+                <div class="stat-card"><div class="numero" style="color:#0099cc">${stats.camino}</div><div class="label">En camino</div></div>
+                <div class="stat-card"><div class="numero" style="color:#1a6e35">${stats.entregados}</div><div class="label">Entregados</div></div>`;
+        }
+
+        async function cargarPendientes() {
+            const res = await fetch(API + '/pedidos/pendientes');
+            const pedidos = await res.json();
+            const tbody = document.getElementById('tabla-pendientes');
+            tbody.innerHTML = '';
+            if (pedidos.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:#666;">No hay pedidos pendientes.</td></tr>'; return; }
+            pedidos.forEach(p => {
+                tbody.innerHTML += `<tr>
+                    <td>#${p.id}</td>
+                    <td>${p.cliente.nombre} ${p.cliente.apellido}</td>
+                    <td>${p.fecha ? p.fecha.substring(0,10) : '-'}</td>
+                    <td>$${p.total}</td>
+                    <td>${p.formaPago}</td>
+                    <td>
+                        <button class="btn btn-verde" style="margin-right:6px" onclick="marcarEnCamino(${p.id})">Marcar en camino</button>
+                        <button class="btn btn-rojo" onclick="cancelar(${p.id})">Cancelar</button>
+                    </td>
+                </tr>`;
             });
         }
 
         async function cambiarEstado(id) {
             const estado = document.getElementById('estado-' + id).value;
-            await fetch(API + '/pedidos/' + id + '/estado', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ estado })
-            });
+            await fetch(API + '/pedidos/' + id + '/estado', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado }) });
             cargarPedidos();
+        }
+
+        async function marcarEnCamino(id) {
+            await fetch(API + '/pedidos/' + id + '/estado', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado: 'EN_CAMINO' }) });
+            cargarPendientes();
+        }
+
+        async function cancelar(id) {
+            if (!confirm('Cancelar este pedido?')) return;
+            await fetch(API + '/pedidos/' + id + '/estado', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado: 'CANCELADO' }) });
+            cargarPendientes();
         }
 
         cargarPedidos();

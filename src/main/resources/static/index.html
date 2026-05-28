@@ -3,81 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Body Paint - Panel de Administración</title>
+    <title>Body Paint - Administración</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
-        header { background: #2E4A8F; color: white; padding: 20px 40px; display: flex; align-items: center; gap: 16px; }
-        header h1 { font-size: 24px; }
-        nav { background: #1F3A6E; padding: 10px 40px; display: flex; gap: 20px; }
-        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; }
-        nav a:hover { background: #2E4A8F; }
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .card h2 { color: #2E4A8F; margin-bottom: 16px; font-size: 20px; }
-        .btn { background: #2E4A8F; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .btn:hover { background: #1F3A6E; }
-        .btn-danger { background: #CC0000; }
-        .btn-danger:hover { background: #990000; }
-        .btn-warning { background: #CC6600; }
-        input, select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; margin-bottom: 12px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #2E4A8F; color: white; padding: 10px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
-        tr:hover { background: #f9f9f9; }
-        .alerta { color: red; font-weight: bold; }
+        body { font-family: Arial, sans-serif; background: #f0f8ff; color: #111; height: 100vh; display: flex; flex-direction: column; }
+        header { background: #0099cc; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        header h1 { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+        header span { font-size: 13px; opacity: 0.85; }
+        .layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 220px; background: #007aa3; flex-shrink: 0; display: flex; flex-direction: column; padding-top: 8px; }
+        .sidebar .seccion-label { color: rgba(255,255,255,0.5); font-size: 11px; padding: 16px 24px 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .sidebar a { color: white; text-decoration: none; padding: 14px 24px; font-size: 14px; border-left: 3px solid transparent; cursor: pointer; display: block; }
+        .sidebar a:hover { background: #0099cc; border-left-color: rgba(255,255,255,0.5); }
+        .sidebar a.activa { background: #005f80; border-left-color: white; font-weight: bold; }
+        .main { flex: 1; overflow-y: auto; padding: 32px; }
+        .card { background: white; border-radius: 8px; padding: 28px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,153,204,0.1); border: 1px solid #cce6f4; }
+        .card h2 { color: #0099cc; margin-bottom: 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid #cce6f4; padding-bottom: 12px; }
+        .btn { background: #0099cc; color: white; border: none; padding: 9px 18px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .btn:hover { background: #007aa3; }
+        .btn-naranja { background: #cc6600; }
+        .btn-naranja:hover { background: #aa5500; }
+        .btn-rojo { background: #cc3300; }
+        .btn-rojo:hover { background: #aa2200; }
+        input, select { padding: 9px 12px; border: 1px solid #aaddee; border-radius: 4px; font-size: 14px; width: 100%; margin-bottom: 14px; background: #f7fbff; }
+        label { font-size: 13px; color: #555; margin-bottom: 4px; display: block; }
         .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .mensaje { padding: 10px; border-radius: 4px; margin-bottom: 12px; display: none; }
-        .mensaje.ok { background: #EEF5E8; color: #3B6D11; display: block; }
-        .mensaje.error { background: #FCEBEB; color: #A32D2D; display: block; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #0099cc; color: white; padding: 10px 12px; text-align: left; font-weight: normal; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e6f4fb; }
+        tr:hover td { background: #f7fbff; }
+        .alerta { color: #cc3300; font-weight: bold; }
+        .mensaje { padding: 10px 14px; border-radius: 4px; margin-bottom: 14px; display: none; font-size: 13px; }
+        .mensaje.ok { background: #e6f9ee; color: #1a6e35; display: block; border-left: 3px solid #2e7d4f; }
+        .mensaje.error { background: #fdecea; color: #a32d2d; display: block; border-left: 3px solid #cc3300; }
+        .seccion { display: none; }
+        .seccion.activa { display: block; }
+        .formato { background: #f0f8ff; border: 1px solid #cce6f4; border-radius: 4px; padding: 12px; margin-bottom: 16px; font-size: 12px; color: #444; }
+        code { background: #e0eef5; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; }
+        .badge-estado { padding: 3px 10px; border-radius: 10px; font-size: 12px; }
+        .badge-activo { background: #e6f9ee; color: #1a6e35; }
+        .badge-inactivo { background: #fdecea; color: #a32d2d; }
     </style>
 </head>
 <body>
     <header>
-        <h1>🎨 Body Paint - Panel de Administración</h1>
+        <h1>BODY PAINT</h1>
+        <span>Panel de Administracion</span>
     </header>
-    <nav>
-        <a href="index.html">Productos</a>
-        <a href="kits.html">Kits</a>
-        <a href="bajo-stock.html">Bajo Stock</a>
-        <a href="importar.html">Importar</a>
-        <a href="cupones.html">Cupones</a>
-    </nav>
-    <div class="container">
-        <div class="card">
-            <h2>Crear Producto</h2>
-            <div id="msg-crear" class="mensaje"></div>
-            <div class="form-group">
-                <input type="text" id="nombre" placeholder="Nombre del producto" />
-                <input type="text" id="marca" placeholder="Marca" />
-                <input type="number" id="precio" placeholder="Precio" />
-                <input type="number" id="stock" placeholder="Stock inicial" />
-                <input type="number" id="stockMinimo" placeholder="Stock mínimo" />
-            </div>
-            <button class="btn" onclick="crearProducto()">Crear Producto</button>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="seccion-label">Productos</div>
+            <a onclick="mostrar('sec-productos')" id="nav-productos" class="activa">Listado de productos</a>
+            <a onclick="mostrar('sec-crear-producto')" id="nav-crear-producto">Crear producto</a>
+            <a onclick="mostrar('sec-bajo-stock')" id="nav-bajo-stock">Bajo stock</a>
+            <a onclick="mostrar('sec-importar')" id="nav-importar">Importar productos</a>
+            <div class="seccion-label">Kits</div>
+            <a onclick="mostrar('sec-kits')" id="nav-kits">Listado de kits</a>
+            <a onclick="mostrar('sec-crear-kit')" id="nav-crear-kit">Crear kit</a>
+            <div class="seccion-label">Ventas</div>
+            <a onclick="mostrar('sec-cupones')" id="nav-cupones">Cupones</a>
+            <a href="vendedor.html">Panel vendedor</a>
+            <a href="tienda.html">Ver tienda</a>
         </div>
-        <div class="card">
-            <h2>Listado de Productos</h2>
-            <button class="btn" onclick="cargarProductos()" style="margin-bottom:16px">Actualizar</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Marca</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Stock Mínimo</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-productos"></tbody>
-            </table>
+
+        <div class="main">
+
+            <!-- PRODUCTOS -->
+            <div id="sec-productos" class="seccion activa">
+                <div class="card">
+                    <h2>Listado de productos</h2>
+                    <button class="btn" onclick="cargarProductos()" style="margin-bottom:16px">Actualizar</button>
+                    <table>
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Marca</th><th>Precio</th><th>Stock</th><th>Stock minimo</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="tabla-productos"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CREAR PRODUCTO -->
+            <div id="sec-crear-producto" class="seccion">
+                <div class="card">
+                    <h2>Crear producto</h2>
+                    <div id="msg-crear" class="mensaje"></div>
+                    <div class="form-group">
+                        <div><label>Nombre</label><input type="text" id="nombre" placeholder="Nombre del producto" /></div>
+                        <div><label>Marca</label><input type="text" id="marca" placeholder="Marca" /></div>
+                        <div><label>Precio</label><input type="number" id="precio" placeholder="Precio" /></div>
+                        <div><label>Stock inicial</label><input type="number" id="stock" placeholder="Stock" /></div>
+                        <div><label>Stock minimo</label><input type="number" id="stockMinimo" placeholder="Stock minimo" /></div>
+                    </div>
+                    <button class="btn" onclick="crearProducto()">Crear producto</button>
+                </div>
+            </div>
+
+            <!-- BAJO STOCK -->
+            <div id="sec-bajo-stock" class="seccion">
+                <div class="card">
+                    <h2>Productos con bajo stock</h2>
+                    <button class="btn" onclick="cargarBajoStock()" style="margin-bottom:16px">Actualizar</button>
+                    <table id="tabla-bajo-container">
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Marca</th><th>Stock actual</th><th>Stock minimo</th><th>Precio</th></tr></thead>
+                        <tbody id="tabla-bajo-stock"></tbody>
+                    </table>
+                    <div id="sin-alertas" style="display:none; padding:24px; text-align:center; color:#1a6e35;">Todos los productos tienen stock suficiente.</div>
+                </div>
+            </div>
+
+            <!-- IMPORTAR -->
+            <div id="sec-importar" class="seccion">
+                <div class="card">
+                    <h2>Importar desde CSV</h2>
+                    <div class="formato">Columnas requeridas: <code>nombre, marca, stock, precio</code></div>
+                    <input type="file" id="archivo-csv" accept=".csv" />
+                    <button class="btn" onclick="importarCSV()">Importar CSV</button>
+                    <div id="msg-csv" class="mensaje"></div>
+                </div>
+                <div class="card">
+                    <h2>Importar desde XLS</h2>
+                    <div class="formato">Columnas en orden: <code>nombre, marca, stock, precio</code>. Primera fila = encabezado.</div>
+                    <input type="file" id="archivo-xls" accept=".xlsx,.xls" />
+                    <button class="btn" onclick="importarXLS()">Importar XLS</button>
+                    <div id="msg-xls" class="mensaje"></div>
+                </div>
+            </div>
+
+            <!-- KITS -->
+            <div id="sec-kits" class="seccion">
+                <div class="card">
+                    <h2>Listado de kits</h2>
+                    <button class="btn" onclick="cargarKits()" style="margin-bottom:16px">Actualizar</button>
+                    <table>
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Productos</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="tabla-kits"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CREAR KIT -->
+            <div id="sec-crear-kit" class="seccion">
+                <div class="card">
+                    <h2>Crear kit</h2>
+                    <div id="msg-kit" class="mensaje"></div>
+                    <div class="form-group">
+                        <div><label>Nombre del kit</label><input type="text" id="kit-nombre" placeholder="Nombre" /></div>
+                        <div><label>Precio del kit</label><input type="number" id="kit-precio" placeholder="Precio" /></div>
+                    </div>
+                    <button class="btn" onclick="crearKit()">Crear kit</button>
+                </div>
+                <div class="card">
+                    <h2>Agregar producto a kit</h2>
+                    <div id="msg-agregar" class="mensaje"></div>
+                    <div class="form-group">
+                        <div><label>ID del kit</label><input type="number" id="kit-id" placeholder="ID del kit" /></div>
+                        <div><label>ID del producto</label><input type="number" id="producto-id" placeholder="ID del producto" /></div>
+                    </div>
+                    <button class="btn" onclick="agregarProductoKit()">Agregar producto</button>
+                </div>
+            </div>
+
+            <!-- CUPONES -->
+            <div id="sec-cupones" class="seccion">
+                <div class="card">
+                    <h2>Generar cupon</h2>
+                    <div id="msg-generar" class="mensaje"></div>
+                    <div class="form-group">
+                        <div><label>Email del cliente</label><input type="email" id="cupon-email" placeholder="cliente@email.com" /></div>
+                        <div><label>Descuento ($)</label><input type="number" id="cupon-descuento" placeholder="Monto de descuento" /></div>
+                        <div><label>Valido hasta</label><input type="date" id="cupon-fecha" /></div>
+                    </div>
+                    <button class="btn" onclick="generarCupon()">Generar cupon</button>
+                </div>
+                <div class="card">
+                    <h2>Cupones generados</h2>
+                    <button class="btn" onclick="cargarCupones()" style="margin-bottom:16px">Actualizar</button>
+                    <table>
+                        <thead><tr><th>Codigo</th><th>Cliente</th><th>Descuento</th><th>Valido hasta</th><th>Estado</th></tr></thead>
+                        <tbody id="tabla-cupones"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
+
     <script>
         const API = 'http://localhost:8081/api';
+
+        function mostrar(id) {
+            document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+            document.getElementById(id).classList.add('activa');
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('activa'));
+            const map = { 'sec-productos': 'nav-productos', 'sec-crear-producto': 'nav-crear-producto', 'sec-bajo-stock': 'nav-bajo-stock', 'sec-importar': 'nav-importar', 'sec-kits': 'nav-kits', 'sec-crear-kit': 'nav-crear-kit', 'sec-cupones': 'nav-cupones' };
+            if (map[id]) document.getElementById(map[id]).classList.add('activa');
+            if (id === 'sec-productos') cargarProductos();
+            if (id === 'sec-bajo-stock') cargarBajoStock();
+            if (id === 'sec-kits') cargarKits();
+            if (id === 'sec-cupones') cargarCupones();
+        }
 
         async function cargarProductos() {
             const res = await fetch(API + '/productos');
@@ -85,59 +207,116 @@
             const tbody = document.getElementById('tabla-productos');
             tbody.innerHTML = '';
             productos.forEach(p => {
-                const bajStock = p.stock <= p.stockMinimo;
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${p.id}</td>
-                        <td>${bajStock ? '🔴 ' : ''}${p.nombre}</td>
-                        <td>${p.marca}</td>
-                        <td>$${p.precio}</td>
-                        <td class="${bajStock ? 'alerta' : ''}">${p.stock}</td>
-                        <td>${p.stockMinimo}</td>
-                        <td>${p.activo ? '✅ Activo' : '❌ Inactivo'}</td>
-                        <td>
-                            <button class="btn btn-warning" onclick="editarStockMinimo(${p.id})">Stock Mín.</button>
-                            <button class="btn btn-danger" onclick="darDeBaja(${p.id})">Dar de baja</button>
-                        </td>
-                    </tr>`;
+                const bajo = p.stock <= p.stockMinimo;
+                tbody.innerHTML += `<tr><td>${p.id}</td><td>${bajo ? '<span class="alerta">' : ''}${p.nombre}${bajo ? '</span>' : ''}</td><td>${p.marca}</td><td>$${p.precio}</td><td class="${bajo ? 'alerta' : ''}">${p.stock}</td><td>${p.stockMinimo}</td><td><span class="badge-estado ${p.activo ? 'badge-activo' : 'badge-inactivo'}">${p.activo ? 'Activo' : 'Inactivo'}</span></td><td><button class="btn btn-naranja" onclick="editarStockMinimo(${p.id})" style="margin-right:6px">Stock min.</button><button class="btn btn-rojo" onclick="darDeBajaProducto(${p.id})">Dar de baja</button></td></tr>`;
             });
         }
 
         async function crearProducto() {
-            const producto = {
-                nombre: document.getElementById('nombre').value,
-                marca: document.getElementById('marca').value,
-                precio: parseFloat(document.getElementById('precio').value),
-                stock: parseInt(document.getElementById('stock').value),
-                stockMinimo: parseInt(document.getElementById('stockMinimo').value)
-            };
-            const res = await fetch(API + '/productos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(producto)
-            });
+            const producto = { nombre: document.getElementById('nombre').value, marca: document.getElementById('marca').value, precio: parseFloat(document.getElementById('precio').value), stock: parseInt(document.getElementById('stock').value), stockMinimo: parseInt(document.getElementById('stockMinimo').value) };
+            const res = await fetch(API + '/productos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(producto) });
             const msg = document.getElementById('msg-crear');
-            if (res.ok) {
-                msg.className = 'mensaje ok';
-                msg.textContent = 'Producto creado correctamente.';
-                cargarProductos();
-            } else {
-                msg.className = 'mensaje error';
-                msg.textContent = 'Error al crear el producto.';
-            }
+            if (res.ok) { msg.className = 'mensaje ok'; msg.textContent = 'Producto creado correctamente.'; }
+            else { msg.className = 'mensaje error'; msg.textContent = 'Error al crear el producto.'; }
         }
 
         async function editarStockMinimo(id) {
-            const valor = prompt('Ingresá el nuevo stock mínimo:');
+            const valor = prompt('Nuevo stock minimo:');
             if (valor === null) return;
             await fetch(API + '/productos/' + id + '/stock-minimo?stockMinimo=' + valor, { method: 'PATCH' });
             cargarProductos();
         }
 
-        async function darDeBaja(id) {
-            if (!confirm('¿Dar de baja este producto?')) return;
+        async function darDeBajaProducto(id) {
+            if (!confirm('Dar de baja este producto?')) return;
             await fetch(API + '/kits/productos/' + id, { method: 'DELETE' });
             cargarProductos();
+        }
+
+        async function cargarBajoStock() {
+            const res = await fetch(API + '/productos/bajo-stock');
+            const productos = await res.json();
+            const tbody = document.getElementById('tabla-bajo-stock');
+            const sinAlertas = document.getElementById('sin-alertas');
+            const tabla = document.getElementById('tabla-bajo-container');
+            tbody.innerHTML = '';
+            if (productos.length === 0) { tabla.style.display = 'none'; sinAlertas.style.display = 'block'; }
+            else {
+                tabla.style.display = 'table'; sinAlertas.style.display = 'none';
+                productos.forEach(p => { tbody.innerHTML += `<tr><td>${p.id}</td><td class="alerta">${p.nombre}</td><td>${p.marca}</td><td class="alerta">${p.stock}</td><td>${p.stockMinimo}</td><td>$${p.precio}</td></tr>`; });
+            }
+        }
+
+        async function importarCSV() {
+            const file = document.getElementById('archivo-csv').files[0];
+            if (!file) { alert('Selecciona un archivo CSV'); return; }
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(API + '/importar/csv', { method: 'POST', body: formData });
+            const msg = document.getElementById('msg-csv');
+            if (res.ok) { const data = await res.json(); msg.className = 'mensaje ok'; msg.textContent = `Importacion exitosa. Nuevos: ${data.nuevos.length} | Actualizados: ${data.actualizados.length}`; }
+            else { msg.className = 'mensaje error'; msg.textContent = 'Error al importar.'; }
+        }
+
+        async function importarXLS() {
+            const file = document.getElementById('archivo-xls').files[0];
+            if (!file) { alert('Selecciona un archivo XLS'); return; }
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(API + '/importar/xls', { method: 'POST', body: formData });
+            const msg = document.getElementById('msg-xls');
+            if (res.ok) { const data = await res.json(); msg.className = 'mensaje ok'; msg.textContent = `Importacion exitosa. Nuevos: ${data.nuevos.length} | Actualizados: ${data.actualizados.length}`; }
+            else { msg.className = 'mensaje error'; msg.textContent = 'Error al importar.'; }
+        }
+
+        async function cargarKits() {
+            const res = await fetch(API + '/kits');
+            const kits = await res.json();
+            const tbody = document.getElementById('tabla-kits');
+            tbody.innerHTML = '';
+            kits.forEach(k => {
+                const productos = k.productos.map(p => p.nombre).join(', ') || 'Sin productos';
+                tbody.innerHTML += `<tr><td>${k.id}</td><td>${k.nombre}</td><td>$${k.precio}</td><td>${productos}</td><td><span class="badge-estado ${k.activo ? 'badge-activo' : 'badge-inactivo'}">${k.activo ? 'Activo' : 'Inactivo'}</span></td><td><button class="btn btn-rojo" onclick="darDeBajaKit(${k.id})">Dar de baja</button></td></tr>`;
+            });
+        }
+
+        async function crearKit() {
+            const kit = { nombre: document.getElementById('kit-nombre').value, precio: parseFloat(document.getElementById('kit-precio').value) };
+            const res = await fetch(API + '/kits', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(kit) });
+            const msg = document.getElementById('msg-kit');
+            if (res.ok) { msg.className = 'mensaje ok'; msg.textContent = 'Kit creado correctamente.'; cargarKits(); }
+            else { msg.className = 'mensaje error'; msg.textContent = 'Error al crear el kit.'; }
+        }
+
+        async function agregarProductoKit() {
+            const kitId = document.getElementById('kit-id').value;
+            const productoId = document.getElementById('producto-id').value;
+            const res = await fetch(API + '/kits/' + kitId + '/productos/' + productoId, { method: 'POST' });
+            const msg = document.getElementById('msg-agregar');
+            if (res.ok) { msg.className = 'mensaje ok'; msg.textContent = 'Producto agregado al kit.'; }
+            else { msg.className = 'mensaje error'; msg.textContent = 'Error al agregar el producto.'; }
+        }
+
+        async function darDeBajaKit(id) {
+            if (!confirm('Dar de baja este kit?')) return;
+            await fetch(API + '/kits/' + id, { method: 'DELETE' });
+            cargarKits();
+        }
+
+        async function generarCupon() {
+            const body = { clienteEmail: document.getElementById('cupon-email').value, descuento: document.getElementById('cupon-descuento').value, validoHasta: document.getElementById('cupon-fecha').value };
+            const res = await fetch(API + '/cupones/generar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            const msg = document.getElementById('msg-generar');
+            if (res.ok) { const data = await res.json(); msg.className = 'mensaje ok'; msg.textContent = `Cupon generado: ${data.codigo} - Descuento: $${data.descuento}`; cargarCupones(); }
+            else { msg.className = 'mensaje error'; msg.textContent = 'Error al generar el cupon.'; }
+        }
+
+        async function cargarCupones() {
+            const res = await fetch(API + '/cupones');
+            const cupones = await res.json();
+            const tbody = document.getElementById('tabla-cupones');
+            tbody.innerHTML = '';
+            cupones.forEach(c => { tbody.innerHTML += `<tr><td><strong>${c.codigo}</strong></td><td>${c.clienteEmail}</td><td>$${c.descuento}</td><td>${c.validoHasta}</td><td><span class="badge-estado ${c.usado ? 'badge-inactivo' : 'badge-activo'}">${c.usado ? 'Usado' : 'Disponible'}</span></td></tr>`; });
         }
 
         cargarProductos();

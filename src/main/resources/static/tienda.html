@@ -6,157 +6,170 @@
     <title>Body Paint - Tienda</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f0f8ff; color: #111; }
-        header { background: #0099cc; color: white; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { font-size: 22px; }
+        body { font-family: Arial, sans-serif; background: #f0f8ff; color: #111; height: 100vh; display: flex; flex-direction: column; }
+        header { background: #0099cc; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        header h1 { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
         .header-right { display: flex; align-items: center; gap: 16px; font-size: 14px; }
-        .btn-cerrar { background: transparent; border: 1px solid white; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-        .btn-cerrar:hover { background: rgba(255,255,255,0.2); }
-        nav { background: #007aa3; padding: 10px 40px; display: flex; gap: 20px; }
-        nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
-        nav a:hover { background: #0099cc; }
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
-        .card { background: white; border-radius: 10px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,153,204,0.1); border: 1px solid #cce6f4; }
-        .card h2 { color: #0099cc; margin-bottom: 16px; font-size: 20px; }
-        .btn { background: #0099cc; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn-cerrar { background: transparent; border: 1px solid white; color: white; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .btn-cerrar:hover { background: rgba(255,255,255,0.15); }
+        .layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 220px; background: #007aa3; flex-shrink: 0; display: flex; flex-direction: column; }
+        .sidebar a { color: white; text-decoration: none; padding: 16px 24px; font-size: 14px; border-left: 3px solid transparent; cursor: pointer; display: block; }
+        .sidebar a:hover { background: #0099cc; border-left-color: white; }
+        .sidebar a.activa { background: #005f80; border-left-color: white; font-weight: bold; }
+        .sidebar .badge { background: #cc3300; color: white; border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: 8px; }
+        .main { flex: 1; overflow-y: auto; padding: 32px; }
+        .card { background: white; border-radius: 8px; padding: 28px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,153,204,0.1); border: 1px solid #cce6f4; }
+        .card h2 { color: #0099cc; margin-bottom: 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid #cce6f4; padding-bottom: 12px; }
+        .btn { background: #0099cc; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
         .btn:hover { background: #007aa3; }
-        .btn-verde { background: #2e9e4f; }
-        .btn-verde:hover { background: #247a3d; }
+        .btn-verde { background: #2e7d4f; }
+        .btn-verde:hover { background: #235f3b; }
         .btn-rojo { background: #cc3300; }
         .btn-rojo:hover { background: #aa2200; }
-        input, select { padding: 8px 12px; border: 1px solid #aaddee; border-radius: 6px; font-size: 14px; width: 100%; margin-bottom: 12px; background: #f7fbff; }
+        input, select { padding: 9px 12px; border: 1px solid #aaddee; border-radius: 4px; font-size: 14px; width: 100%; margin-bottom: 14px; background: #f7fbff; }
         .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-        .producto-card { background: #f0f8ff; border: 1px solid #cce6f4; border-radius: 10px; padding: 16px; text-align: center; }
-        .producto-card h3 { color: #0099cc; font-size: 15px; margin-bottom: 8px; }
-        .producto-card .precio { font-size: 20px; font-weight: bold; color: #111; margin-bottom: 8px; }
+        .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+        .producto-card { background: #f7fbff; border: 1px solid #cce6f4; border-radius: 8px; padding: 16px; text-align: center; }
+        .producto-card h3 { color: #005f80; font-size: 14px; margin-bottom: 8px; }
+        .producto-card .precio { font-size: 20px; font-weight: bold; color: #111; margin-bottom: 6px; }
         .producto-card .stock { font-size: 12px; color: #666; margin-bottom: 12px; }
-        .carrito-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #cce6f4; }
-        .total { font-size: 22px; font-weight: bold; color: #0099cc; text-align: right; margin-top: 16px; }
-        .mensaje { padding: 10px; border-radius: 6px; margin-top: 12px; display: none; }
-        .mensaje.ok { background: #e6f9ee; color: #1a6e35; display: block; }
-        .mensaje.error { background: #fdecea; color: #a32d2d; display: block; }
+        .carrito-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #cce6f4; }
+        .total-box { background: #f0f8ff; border: 1px solid #cce6f4; border-radius: 6px; padding: 16px; text-align: right; margin-top: 16px; font-size: 18px; font-weight: bold; color: #0099cc; }
+        .mensaje { padding: 10px 14px; border-radius: 4px; margin-top: 12px; display: none; font-size: 13px; }
+        .mensaje.ok { background: #e6f9ee; color: #1a6e35; display: block; border-left: 3px solid #2e7d4f; }
+        .mensaje.error { background: #fdecea; color: #a32d2d; display: block; border-left: 3px solid #cc3300; }
         .seccion { display: none; }
         .seccion.activa { display: block; }
-        .badge { background: #cc3300; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; margin-left: 4px; }
-        .form-pago { display: flex; gap: 12px; margin-bottom: 16px; }
-        .opcion-pago { flex: 1; border: 2px solid #cce6f4; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
+        .form-pago { display: flex; gap: 16px; margin-bottom: 20px; }
+        .opcion-pago { flex: 1; border: 2px solid #cce6f4; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; background: white; }
+        .opcion-pago:hover { border-color: #0099cc; }
         .opcion-pago.seleccionada { border-color: #0099cc; background: #e6f4fb; }
-        .opcion-pago h3 { color: #0099cc; margin-bottom: 4px; }
+        .opcion-pago h3 { color: #0099cc; margin-bottom: 4px; font-size: 15px; }
         .opcion-pago p { font-size: 12px; color: #666; }
-        .tabs { display: flex; gap: 0; margin-bottom: 24px; }
-        .tab { flex: 1; padding: 12px; text-align: center; background: #e6f4fb; border: 1px solid #cce6f4; cursor: pointer; font-size: 15px; }
+        .tabs { display: flex; margin-bottom: 24px; border: 1px solid #cce6f4; border-radius: 6px; overflow: hidden; }
+        .tab { flex: 1; padding: 12px; text-align: center; background: #f0f8ff; cursor: pointer; font-size: 14px; border: none; }
         .tab.activa { background: #0099cc; color: white; font-weight: bold; }
-        .tab:first-child { border-radius: 8px 0 0 8px; }
-        .tab:last-child { border-radius: 0 8px 8px 0; }
-        .bienvenida { text-align: center; padding: 40px; }
-        .bienvenida h2 { color: #0099cc; font-size: 28px; margin-bottom: 12px; }
-        .bienvenida p { color: #555; font-size: 16px; margin-bottom: 24px; }
+        .bienvenida { text-align: center; padding: 32px 0; }
+        .bienvenida h2 { color: #0099cc; font-size: 24px; margin-bottom: 8px; }
+        .bienvenida p { color: #555; font-size: 14px; margin-bottom: 24px; }
+        .auth-wrapper { max-width: 480px; margin: 0 auto; }
+        .pedido-item { border: 1px solid #cce6f4; border-radius: 6px; padding: 16px; margin-bottom: 12px; font-size: 14px; }
+        .pedido-item strong { color: #0099cc; }
+        label { font-size: 13px; color: #555; margin-bottom: 4px; display: block; }
     </style>
 </head>
 <body>
     <header>
-        <h1>🎨 Body Paint</h1>
+        <h1>BODY PAINT</h1>
         <div class="header-right">
             <span id="user-info"></span>
             <button class="btn-cerrar" id="btn-cerrar" style="display:none" onclick="cerrarSesion()">Cerrar sesión</button>
         </div>
     </header>
-    <nav id="nav-sin-login">
-        <a onclick="mostrarTab('login')">Iniciar sesión</a>
-        <a onclick="mostrarTab('registro')">Registrarse</a>
-    </nav>
-    <nav id="nav-logueado" style="display:none">
-        <a onclick="mostrar('seccion-tienda')">🛍️ Tienda</a>
-        <a onclick="mostrar('seccion-carrito')">🛒 Carrito <span class="badge" id="badge-carrito">0</span></a>
-        <a onclick="mostrar('seccion-pedidos')">📦 Mis pedidos</a>
-    </nav>
 
-    <div class="container">
-
-        <!-- AUTH -->
-        <div id="seccion-auth" class="seccion activa">
-            <div class="card" style="max-width:500px; margin: 0 auto;">
-                <div class="bienvenida">
-                    <h2>🎨 Bienvenido a Body Paint</h2>
-                    <p>Iniciá sesión o registrate para comprar</p>
-                </div>
-                <div class="tabs">
-                    <div class="tab activa" id="tab-login" onclick="mostrarTab('login')">Iniciar sesión</div>
-                    <div class="tab" id="tab-registro" onclick="mostrarTab('registro')">Registrarse</div>
-                </div>
-                <div id="form-login">
-                    <div id="msg-login" class="mensaje"></div>
-                    <input type="email" id="login-email" placeholder="Email" />
-                    <input type="password" id="login-pass" placeholder="Contraseña" />
-                    <button class="btn" style="width:100%" onclick="login()">Ingresar</button>
-                </div>
-                <div id="form-registro" style="display:none">
-                    <div id="msg-registro" class="mensaje"></div>
-                    <div class="form-group">
-                        <input type="text" id="reg-nombre" placeholder="Nombre *" />
-                        <input type="text" id="reg-apellido" placeholder="Apellido *" />
-                        <input type="email" id="reg-email" placeholder="Email *" />
-                        <input type="password" id="reg-pass" placeholder="Contraseña * (mín. 6 caracteres)" />
-                        <input type="text" id="reg-telefono" placeholder="Teléfono" />
-                        <input type="text" id="reg-direccion" placeholder="Dirección" />
-                        <input type="text" id="reg-ciudad" placeholder="Ciudad" />
-                        <input type="text" id="reg-provincia" placeholder="Provincia" />
-                    </div>
-                    <input type="text" id="reg-pais" placeholder="País" />
-                    <button class="btn" style="width:100%" onclick="registrar()">Crear cuenta</button>
-                </div>
-            </div>
+    <div class="layout">
+        <div class="sidebar" id="sidebar-sin-login">
+            <a onclick="mostrarTab('login')" id="nav-login" class="activa">Iniciar sesión</a>
+            <a onclick="mostrarTab('registro')" id="nav-registro">Registrarse</a>
+        </div>
+        <div class="sidebar" id="sidebar-logueado" style="display:none">
+            <a onclick="mostrar('seccion-tienda')" id="nav-tienda">Tienda</a>
+            <a onclick="mostrar('seccion-carrito')" id="nav-carrito">Carrito <span class="badge" id="badge-carrito">0</span></a>
+            <a onclick="mostrar('seccion-pedidos')" id="nav-pedidos">Mis pedidos</a>
         </div>
 
-        <!-- TIENDA -->
-        <div id="seccion-tienda" class="seccion">
-            <div class="card">
-                <h2>🛍️ Productos disponibles</h2>
-                <div class="productos-grid" id="productos-grid"></div>
-            </div>
-        </div>
+        <div class="main">
 
-        <!-- CARRITO -->
-        <div id="seccion-carrito" class="seccion">
-            <div class="card">
-                <h2>🛒 Tu carrito</h2>
-                <div id="carrito-items"></div>
-                <div class="total" id="carrito-total">Total: $0</div>
-            </div>
-            <div class="card">
-                <h2>Cupón de descuento</h2>
-                <div style="display:flex; gap:12px;">
-                    <input type="text" id="cupon-input" placeholder="Ingresá tu código de cupón" style="margin:0;" />
-                    <button class="btn" onclick="aplicarCupon()">Aplicar</button>
-                </div>
-                <div id="msg-cupon" class="mensaje"></div>
-            </div>
-            <div class="card">
-                <h2>Forma de pago</h2>
-                <div class="form-pago">
-                    <div class="opcion-pago seleccionada" id="pago-efectivo" onclick="seleccionarPago('efectivo')">
-                        <h3>💵 Efectivo</h3>
-                        <p>Pagás al recibir el pedido</p>
-                    </div>
-                    <div class="opcion-pago" id="pago-mp" onclick="seleccionarPago('mercadopago')">
-                        <h3>💳 Mercado Pago</h3>
-                        <p>Pagás online de forma segura</p>
+            <!-- AUTH -->
+            <div id="seccion-auth" class="seccion activa">
+                <div class="auth-wrapper">
+                    <div class="card">
+                        <div class="bienvenida">
+                            <h2>Bienvenido a Body Paint</h2>
+                            <p>Iniciá sesión o registrate para comprar</p>
+                        </div>
+                        <div class="tabs">
+                            <div class="tab activa" id="tab-login" onclick="mostrarTab('login')">Iniciar sesión</div>
+                            <div class="tab" id="tab-registro" onclick="mostrarTab('registro')">Registrarse</div>
+                        </div>
+                        <div id="form-login">
+                            <div id="msg-login" class="mensaje"></div>
+                            <label>Email</label>
+                            <input type="email" id="login-email" placeholder="tu@email.com" />
+                            <label>Contraseña</label>
+                            <input type="password" id="login-pass" placeholder="Contraseña" />
+                            <button class="btn" style="width:100%" onclick="login()">Ingresar</button>
+                        </div>
+                        <div id="form-registro" style="display:none">
+                            <div id="msg-registro" class="mensaje"></div>
+                            <div class="form-group">
+                                <div><label>Nombre *</label><input type="text" id="reg-nombre" placeholder="Nombre" /></div>
+                                <div><label>Apellido *</label><input type="text" id="reg-apellido" placeholder="Apellido" /></div>
+                                <div><label>Email *</label><input type="email" id="reg-email" placeholder="tu@email.com" /></div>
+                                <div><label>Contraseña * (mín. 6 caracteres)</label><input type="password" id="reg-pass" placeholder="Contraseña" /></div>
+                                <div><label>Teléfono</label><input type="text" id="reg-telefono" placeholder="Teléfono" /></div>
+                                <div><label>Dirección</label><input type="text" id="reg-direccion" placeholder="Calle y número" /></div>
+                                <div><label>Ciudad</label><input type="text" id="reg-ciudad" placeholder="Ciudad" /></div>
+                                <div><label>Provincia</label><input type="text" id="reg-provincia" placeholder="Provincia" /></div>
+                            </div>
+                            <label>País</label>
+                            <input type="text" id="reg-pais" placeholder="País" />
+                            <button class="btn" style="width:100%" onclick="registrar()">Crear cuenta</button>
+                        </div>
                     </div>
                 </div>
-                <div id="msg-pedido" class="mensaje"></div>
-                <button class="btn btn-verde" style="width:100%" onclick="confirmarPedido()">Confirmar pedido</button>
             </div>
-        </div>
 
-        <!-- MIS PEDIDOS -->
-        <div id="seccion-pedidos" class="seccion">
-            <div class="card">
-                <h2>📦 Mis pedidos</h2>
-                <div id="lista-pedidos"></div>
+            <!-- TIENDA -->
+            <div id="seccion-tienda" class="seccion">
+                <div class="card">
+                    <h2>Productos disponibles</h2>
+                    <div class="productos-grid" id="productos-grid"></div>
+                </div>
             </div>
-        </div>
 
+            <!-- CARRITO -->
+            <div id="seccion-carrito" class="seccion">
+                <div class="card">
+                    <h2>Tu carrito</h2>
+                    <div id="carrito-items"></div>
+                    <div class="total-box" id="carrito-total">Total: $0</div>
+                </div>
+                <div class="card">
+                    <h2>Cupón de descuento</h2>
+                    <div style="display:flex; gap:12px; align-items:flex-start;">
+                        <input type="text" id="cupon-input" placeholder="Código de cupón" style="margin:0; flex:1;" />
+                        <button class="btn" onclick="aplicarCupon()">Aplicar</button>
+                    </div>
+                    <div id="msg-cupon" class="mensaje"></div>
+                </div>
+                <div class="card">
+                    <h2>Forma de pago</h2>
+                    <div class="form-pago">
+                        <div class="opcion-pago seleccionada" id="pago-efectivo" onclick="seleccionarPago('efectivo')">
+                            <h3>Efectivo</h3>
+                            <p>Pagás al recibir el pedido</p>
+                        </div>
+                        <div class="opcion-pago" id="pago-mp" onclick="seleccionarPago('mercadopago')">
+                            <h3>Mercado Pago</h3>
+                            <p>Pagás online de forma segura</p>
+                        </div>
+                    </div>
+                    <div id="msg-pedido" class="mensaje"></div>
+                    <button class="btn btn-verde" style="width:100%; padding:14px;" onclick="confirmarPedido()">Confirmar pedido</button>
+                </div>
+            </div>
+
+            <!-- MIS PEDIDOS -->
+            <div id="seccion-pedidos" class="seccion">
+                <div class="card">
+                    <h2>Mis pedidos</h2>
+                    <div id="lista-pedidos"></div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script>
@@ -172,11 +185,16 @@
             document.getElementById('form-registro').style.display = tab === 'registro' ? 'block' : 'none';
             document.getElementById('tab-login').classList.toggle('activa', tab === 'login');
             document.getElementById('tab-registro').classList.toggle('activa', tab === 'registro');
+            document.getElementById('nav-login').classList.toggle('activa', tab === 'login');
+            document.getElementById('nav-registro').classList.toggle('activa', tab === 'registro');
         }
 
         function mostrar(id) {
             document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
             document.getElementById(id).classList.add('activa');
+            document.querySelectorAll('#sidebar-logueado a').forEach(a => a.classList.remove('activa'));
+            const map = { 'seccion-tienda': 'nav-tienda', 'seccion-carrito': 'nav-carrito', 'seccion-pedidos': 'nav-pedidos' };
+            if (map[id]) document.getElementById(map[id]).classList.add('activa');
             if (id === 'seccion-tienda') cargarProductos();
             if (id === 'seccion-carrito') renderCarrito();
             if (id === 'seccion-pedidos') cargarPedidos();
@@ -194,8 +212,8 @@
             document.getElementById('badge-carrito').textContent = 0;
             document.getElementById('user-info').textContent = '';
             document.getElementById('btn-cerrar').style.display = 'none';
-            document.getElementById('nav-sin-login').style.display = 'flex';
-            document.getElementById('nav-logueado').style.display = 'none';
+            document.getElementById('sidebar-sin-login').style.display = 'flex';
+            document.getElementById('sidebar-logueado').style.display = 'none';
             mostrar('seccion-auth');
         }
 
@@ -203,28 +221,17 @@
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
             const msg = document.getElementById('msg-login');
-            if (!email || !pass) {
-                msg.className = 'mensaje error';
-                msg.textContent = 'Completá email y contraseña.';
-                return;
-            }
-            const res = await fetch(API + '/clientes/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password: pass })
-            });
+            if (!email || !pass) { msg.className = 'mensaje error'; msg.textContent = 'Completá email y contraseña.'; return; }
+            const res = await fetch(API + '/clientes/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: pass }) });
             const data = await res.json();
             if (res.ok) {
                 clienteLogueado = data;
-                document.getElementById('user-info').textContent = 'Hola, ' + data.nombre + ' ' + data.apellido;
+                document.getElementById('user-info').textContent = data.nombre + ' ' + data.apellido;
                 document.getElementById('btn-cerrar').style.display = 'block';
-                document.getElementById('nav-sin-login').style.display = 'none';
-                document.getElementById('nav-logueado').style.display = 'flex';
+                document.getElementById('sidebar-sin-login').style.display = 'none';
+                document.getElementById('sidebar-logueado').style.display = 'flex';
                 mostrar('seccion-tienda');
-            } else {
-                msg.className = 'mensaje error';
-                msg.textContent = data.error || 'Error al iniciar sesión.';
-            }
+            } else { msg.className = 'mensaje error'; msg.textContent = data.error || 'Error al iniciar sesión.'; }
         }
 
         async function registrar() {
@@ -233,38 +240,13 @@
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
             const msg = document.getElementById('msg-registro');
-            if (!nombre || !apellido || !email || !pass) {
-                msg.className = 'mensaje error';
-                msg.textContent = 'Completá los campos obligatorios.';
-                return;
-            }
-            if (pass.length < 6) {
-                msg.className = 'mensaje error';
-                msg.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-                return;
-            }
-            const cliente = {
-                nombre, apellido, email, password: pass,
-                telefono: document.getElementById('reg-telefono').value,
-                direccion: document.getElementById('reg-direccion').value,
-                ciudad: document.getElementById('reg-ciudad').value,
-                provincia: document.getElementById('reg-provincia').value,
-                pais: document.getElementById('reg-pais').value
-            };
-            const res = await fetch(API + '/clientes/registro', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(cliente)
-            });
+            if (!nombre || !apellido || !email || !pass) { msg.className = 'mensaje error'; msg.textContent = 'Completá los campos obligatorios.'; return; }
+            if (pass.length < 6) { msg.className = 'mensaje error'; msg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; return; }
+            const cliente = { nombre, apellido, email, password: pass, telefono: document.getElementById('reg-telefono').value, direccion: document.getElementById('reg-direccion').value, ciudad: document.getElementById('reg-ciudad').value, provincia: document.getElementById('reg-provincia').value, pais: document.getElementById('reg-pais').value };
+            const res = await fetch(API + '/clientes/registro', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cliente) });
             const data = await res.json();
-            if (res.ok) {
-                msg.className = 'mensaje ok';
-                msg.textContent = 'Cuenta creada. Ya podés iniciar sesión.';
-                setTimeout(() => mostrarTab('login'), 1500);
-            } else {
-                msg.className = 'mensaje error';
-                msg.textContent = data.error || 'Error al registrarse.';
-            }
+            if (res.ok) { msg.className = 'mensaje ok'; msg.textContent = 'Cuenta creada. Ya podés iniciar sesión.'; setTimeout(() => mostrarTab('login'), 1500); }
+            else { msg.className = 'mensaje error'; msg.textContent = data.error || 'Error al registrarse.'; }
         }
 
         async function cargarProductos() {
@@ -273,47 +255,29 @@
             const grid = document.getElementById('productos-grid');
             grid.innerHTML = '';
             productos.forEach(p => {
-                grid.innerHTML += `
-                    <div class="producto-card">
-                        <h3>${p.nombre}</h3>
-                        <div class="precio">$${p.precio}</div>
-                        <div class="stock">Stock: ${p.stock}</div>
-                        <input type="number" min="1" max="${p.stock}" value="1" id="cant-${p.id}" style="width:60px; margin:0 auto 10px; display:block;" />
-                        <button class="btn" onclick="agregarAlCarrito(${p.id}, '${p.nombre}', ${p.precio})">Agregar</button>
-                    </div>`;
+                grid.innerHTML += `<div class="producto-card"><h3>${p.nombre}</h3><div class="precio">$${p.precio}</div><div class="stock">Stock disponible: ${p.stock}</div><input type="number" min="1" max="${p.stock}" value="1" id="cant-${p.id}" style="width:70px; margin:0 auto 10px; display:block;" /><button class="btn" onclick="agregarAlCarrito(${p.id}, '${p.nombre}', ${p.precio})">Agregar al carrito</button></div>`;
             });
         }
 
         function agregarAlCarrito(id, nombre, precio) {
             const cant = parseInt(document.getElementById('cant-' + id).value);
             const existente = carrito.find(i => i.productoId === id);
-            if (existente) {
-                existente.cantidad += cant;
-            } else {
-                carrito.push({ productoId: id, nombre, precio, cantidad: cant });
-            }
+            if (existente) existente.cantidad += cant;
+            else carrito.push({ productoId: id, nombre, precio, cantidad: cant });
             document.getElementById('badge-carrito').textContent = carrito.length;
-            renderCarrito();
         }
 
         function renderCarrito() {
             const container = document.getElementById('carrito-items');
             container.innerHTML = '';
             let total = 0;
+            if (carrito.length === 0) { container.innerHTML = '<p style="color:#666; padding:16px 0;">El carrito está vacío.</p>'; }
             carrito.forEach((item, idx) => {
                 total += item.precio * item.cantidad;
-                container.innerHTML += `
-                    <div class="carrito-item">
-                        <span>${item.nombre} x${item.cantidad}</span>
-                        <span>$${item.precio * item.cantidad}</span>
-                        <button class="btn btn-rojo" onclick="quitarDelCarrito(${idx})">✕</button>
-                    </div>`;
+                container.innerHTML += `<div class="carrito-item"><span>${item.nombre} x${item.cantidad}</span><span>$${item.precio * item.cantidad}</span><button class="btn btn-rojo" style="padding:6px 12px;" onclick="quitarDelCarrito(${idx})">Quitar</button></div>`;
             });
             const totalConDescuento = total - descuentoCupon;
-            document.getElementById('carrito-total').innerHTML =
-                descuentoCupon > 0
-                    ? `Subtotal: $${total} | Descuento: -$${descuentoCupon} | <strong>Total: $${totalConDescuento}</strong>`
-                    : `Total: $${total}`;
+            document.getElementById('carrito-total').innerHTML = descuentoCupon > 0 ? `Subtotal: $${total} &nbsp;|&nbsp; Descuento: -$${descuentoCupon} &nbsp;|&nbsp; Total: $${totalConDescuento}` : `Total: $${total}`;
         }
 
         function quitarDelCarrito(idx) {
@@ -325,67 +289,28 @@
         async function aplicarCupon() {
             const codigo = document.getElementById('cupon-input').value;
             const total = carrito.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
-            const res = await fetch(API + '/cupones/aplicar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ codigo, montoTotal: total.toString() })
-            });
+            const res = await fetch(API + '/cupones/aplicar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codigo, montoTotal: total.toString() }) });
             const data = await res.json();
             const msg = document.getElementById('msg-cupon');
-            if (res.ok) {
-                descuentoCupon = data.descuento;
-                codigoCuponAplicado = codigo;
-                msg.className = 'mensaje ok';
-                msg.textContent = `Cupón aplicado. Descuento: $${data.descuento}. Total final: $${data.montoFinal}`;
-                renderCarrito();
-            } else {
-                msg.className = 'mensaje error';
-                msg.textContent = data.error || 'Cupón inválido.';
-            }
+            if (res.ok) { descuentoCupon = data.descuento; codigoCuponAplicado = codigo; msg.className = 'mensaje ok'; msg.textContent = `Cupon aplicado. Descuento: $${data.descuento}. Total final: $${data.montoFinal}`; renderCarrito(); }
+            else { msg.className = 'mensaje error'; msg.textContent = data.error || 'Cupon invalido.'; }
         }
 
         async function confirmarPedido() {
-            if (carrito.length === 0) {
-                alert('El carrito está vacío.');
-                return;
-            }
-            const body = {
-                clienteId: clienteLogueado.id,
-                items: carrito.map(i => ({ productoId: i.productoId, cantidad: i.cantidad })),
-                formaPago: formaPagoSeleccionada,
-                cupon: codigoCuponAplicado
-            };
-            const res = await fetch(API + '/pedidos/confirmar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
+            if (carrito.length === 0) { alert('El carrito esta vacio.'); return; }
+            const body = { clienteId: clienteLogueado.id, items: carrito.map(i => ({ productoId: i.productoId, cantidad: i.cantidad })), formaPago: formaPagoSeleccionada, cupon: codigoCuponAplicado };
+            const res = await fetch(API + '/pedidos/confirmar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
             const data = await res.json();
             const msg = document.getElementById('msg-pedido');
             if (res.ok) {
                 if (formaPagoSeleccionada === 'mercadopago') {
-                    const pagoRes = await fetch(API + '/pagos/mercadopago', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ titulo: 'Pedido Body Paint #' + data.id, monto: data.total.toString() })
-                    });
+                    const pagoRes = await fetch(API + '/pagos/mercadopago', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ titulo: 'Pedido Body Paint #' + data.id, monto: data.total.toString() }) });
                     const pagoData = await pagoRes.json();
-                    if (pagoRes.ok) {
-                        msg.className = 'mensaje ok';
-                        msg.innerHTML = `Pedido #${data.id} confirmado. <a href="${pagoData.url}" target="_blank">Clickeá acá para pagar con Mercado Pago</a>`;
-                    }
-                } else {
-                    msg.className = 'mensaje ok';
-                    msg.textContent = `Pedido #${data.id} confirmado. Total: $${data.total}. Pagás en efectivo al recibir.`;
-                }
-                carrito = [];
-                descuentoCupon = 0;
-                codigoCuponAplicado = '';
+                    if (pagoRes.ok) { msg.className = 'mensaje ok'; msg.innerHTML = `Pedido #${data.id} confirmado. <a href="${pagoData.url}" target="_blank" style="color:#0099cc;">Pagar con Mercado Pago</a>`; }
+                } else { msg.className = 'mensaje ok'; msg.textContent = `Pedido #${data.id} confirmado. Total: $${data.total}. Pago en efectivo al recibir.`; }
+                carrito = []; descuentoCupon = 0; codigoCuponAplicado = '';
                 document.getElementById('badge-carrito').textContent = 0;
-            } else {
-                msg.className = 'mensaje error';
-                msg.textContent = data.error || 'Error al confirmar el pedido.';
-            }
+            } else { msg.className = 'mensaje error'; msg.textContent = data.error || 'Error al confirmar el pedido.'; }
         }
 
         async function cargarPedidos() {
@@ -394,16 +319,9 @@
             const misPedidos = pedidos.filter(p => p.cliente.id === clienteLogueado.id);
             const container = document.getElementById('lista-pedidos');
             container.innerHTML = '';
-            if (misPedidos.length === 0) {
-                container.innerHTML = '<p style="color:#666">No tenés pedidos aún.</p>';
-                return;
-            }
+            if (misPedidos.length === 0) { container.innerHTML = '<p style="color:#666">No tenes pedidos aun.</p>'; return; }
             misPedidos.forEach(p => {
-                container.innerHTML += `
-                    <div style="border:1px solid #cce6f4; border-radius:8px; padding:16px; margin-bottom:12px;">
-                        <strong>Pedido #${p.id}</strong> - ${p.fecha}<br>
-                        Estado: <strong>${p.estado}</strong> | Forma de pago: ${p.formaPago} | Total: <strong>$${p.total}</strong>
-                    </div>`;
+                container.innerHTML += `<div class="pedido-item"><strong>Pedido #${p.id}</strong> &nbsp;|&nbsp; ${p.fecha}<br>Estado: <strong>${p.estado}</strong> &nbsp;|&nbsp; Pago: ${p.formaPago} &nbsp;|&nbsp; Total: <strong>$${p.total}</strong></div>`;
             });
         }
     </script>
