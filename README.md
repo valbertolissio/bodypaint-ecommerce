@@ -16,3 +16,7 @@ A definir por el equipo.
 
 ## Jira
 https://valbertolissio9.atlassian.net/jira/software/projects/BPP/boards/2/backlog
+
+Panel administrador: http://localhost:8081/index.html
+Tienda cliente: http://localhost:8081/tienda.html
+Panel vendedor: http://localhost:8081/vendedor.html
