@@ -9,7 +9,9 @@
         body { font-family: Arial, sans-serif; background: #f0f8ff; color: #111; }
         header { background: #0099cc; color: white; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; }
         header h1 { font-size: 22px; }
-        header .user-info { font-size: 14px; }
+        .header-right { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+        .btn-cerrar { background: transparent; border: 1px solid white; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .btn-cerrar:hover { background: rgba(255,255,255,0.2); }
         nav { background: #007aa3; padding: 10px 40px; display: flex; gap: 20px; }
         nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
         nav a:hover { background: #0099cc; }
@@ -22,8 +24,6 @@
         .btn-verde:hover { background: #247a3d; }
         .btn-rojo { background: #cc3300; }
         .btn-rojo:hover { background: #aa2200; }
-        .btn-outline { background: white; color: #0099cc; border: 2px solid #0099cc; }
-        .btn-outline:hover { background: #e6f4fb; }
         input, select { padding: 8px 12px; border: 1px solid #aaddee; border-radius: 6px; font-size: 14px; width: 100%; margin-bottom: 12px; background: #f7fbff; }
         .form-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
@@ -49,7 +49,6 @@
         .tab.activa { background: #0099cc; color: white; font-weight: bold; }
         .tab:first-child { border-radius: 8px 0 0 8px; }
         .tab:last-child { border-radius: 0 8px 8px 0; }
-        .nav-logueado { display: none; }
         .bienvenida { text-align: center; padding: 40px; }
         .bienvenida h2 { color: #0099cc; font-size: 28px; margin-bottom: 12px; }
         .bienvenida p { color: #555; font-size: 16px; margin-bottom: 24px; }
@@ -58,17 +57,19 @@
 <body>
     <header>
         <h1>🎨 Body Paint</h1>
-        <div class="user-info" id="user-info"></div>
+        <div class="header-right">
+            <span id="user-info"></span>
+            <button class="btn-cerrar" id="btn-cerrar" style="display:none" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
     </header>
     <nav id="nav-sin-login">
         <a onclick="mostrarTab('login')">Iniciar sesión</a>
         <a onclick="mostrarTab('registro')">Registrarse</a>
     </nav>
-    <nav id="nav-logueado" class="nav-logueado">
+    <nav id="nav-logueado" style="display:none">
         <a onclick="mostrar('seccion-tienda')">🛍️ Tienda</a>
         <a onclick="mostrar('seccion-carrito')">🛒 Carrito <span class="badge" id="badge-carrito">0</span></a>
         <a onclick="mostrar('seccion-pedidos')">📦 Mis pedidos</a>
-        <a onclick="cerrarSesion()">Cerrar sesión</a>
     </nav>
 
     <div class="container">
@@ -84,23 +85,19 @@
                     <div class="tab activa" id="tab-login" onclick="mostrarTab('login')">Iniciar sesión</div>
                     <div class="tab" id="tab-registro" onclick="mostrarTab('registro')">Registrarse</div>
                 </div>
-
-                <!-- LOGIN FORM -->
                 <div id="form-login">
                     <div id="msg-login" class="mensaje"></div>
                     <input type="email" id="login-email" placeholder="Email" />
                     <input type="password" id="login-pass" placeholder="Contraseña" />
                     <button class="btn" style="width:100%" onclick="login()">Ingresar</button>
                 </div>
-
-                <!-- REGISTRO FORM -->
                 <div id="form-registro" style="display:none">
                     <div id="msg-registro" class="mensaje"></div>
                     <div class="form-group">
                         <input type="text" id="reg-nombre" placeholder="Nombre *" />
                         <input type="text" id="reg-apellido" placeholder="Apellido *" />
                         <input type="email" id="reg-email" placeholder="Email *" />
-                        <input type="password" id="reg-pass" placeholder="Contraseña *" />
+                        <input type="password" id="reg-pass" placeholder="Contraseña * (mín. 6 caracteres)" />
                         <input type="text" id="reg-telefono" placeholder="Teléfono" />
                         <input type="text" id="reg-direccion" placeholder="Dirección" />
                         <input type="text" id="reg-ciudad" placeholder="Ciudad" />
@@ -196,6 +193,7 @@
             carrito = [];
             document.getElementById('badge-carrito').textContent = 0;
             document.getElementById('user-info').textContent = '';
+            document.getElementById('btn-cerrar').style.display = 'none';
             document.getElementById('nav-sin-login').style.display = 'flex';
             document.getElementById('nav-logueado').style.display = 'none';
             mostrar('seccion-auth');
@@ -219,6 +217,7 @@
             if (res.ok) {
                 clienteLogueado = data;
                 document.getElementById('user-info').textContent = 'Hola, ' + data.nombre + ' ' + data.apellido;
+                document.getElementById('btn-cerrar').style.display = 'block';
                 document.getElementById('nav-sin-login').style.display = 'none';
                 document.getElementById('nav-logueado').style.display = 'flex';
                 mostrar('seccion-tienda');
@@ -236,7 +235,7 @@
             const msg = document.getElementById('msg-registro');
             if (!nombre || !apellido || !email || !pass) {
                 msg.className = 'mensaje error';
-                msg.textContent = 'Completá los campos obligatorios (Nombre, Apellido, Email y Contraseña).';
+                msg.textContent = 'Completá los campos obligatorios.';
                 return;
             }
             if (pass.length < 6) {
